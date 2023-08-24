@@ -1,6 +1,7 @@
 package com.alex.dag1;
 
 import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
+import com.alex.dag1.models.BlogPost;
 import com.alex.dag1.models.Forecast;
 import com.alex.dag1.services.ForecastService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.net.URL;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -25,6 +27,15 @@ public class Dag1Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		var objectMapper = new ObjectMapper();
+
+		//BlogPost []blogPosts = objectMapper.readValue(new URL("https://jsonplaceholder.typicode.com/posts"),
+		//BlogPost[].class);
+
+		// BlogPost blogPost = objectMapper.readValue(new URL("https://jsonplaceholder.typicode.com/posts/1"),
+				// BlogPost.class); //Kommer hämta värderna från länken och lägga in de i våran klass / i våra variablar.
+
+
 		var scan = new Scanner(System.in);
 
 		var castFore = new Forecast();
@@ -32,7 +43,6 @@ public class Dag1Application implements CommandLineRunner {
 		castFore.setTemperature(21f);
 		castFore.setDate(20230824);
 		castFore.setHour(12);
-		var objectMapper = new ObjectMapper();
 		String json = objectMapper.writeValueAsString(castFore); //Skapar ett json object av "castFore" gör det till String.
 		System.out.println("This is the json object: " + json);
 

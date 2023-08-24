@@ -2,14 +2,20 @@ package com.alex.dag1.models;
 
 public class BlogPost {
 
-    private int userID;
+    private int userId;
+
+    private int id;
+
+    private String title;
+
+    private String body;
 
     public int getUserID() {
-        return userID;
+        return userId;
     }
 
     public void setUserID(int userID) {
-        this.userID = userID;
+        this.userId = userID;
     }
 
     public int getId() {
@@ -35,10 +41,4 @@ public class BlogPost {
     public void setBody(String body) {
         this.body = body;
     }
-
-    private int id;
-
-    private String title;
-
-    private String body;
 }
