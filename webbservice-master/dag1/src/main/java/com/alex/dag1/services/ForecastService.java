@@ -1,10 +1,12 @@
 package com.alex.dag1.services;
 
 import com.alex.dag1.models.Forecast;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ForecastService {
     private static List<Forecast> forecasts = new ArrayList<>();
     

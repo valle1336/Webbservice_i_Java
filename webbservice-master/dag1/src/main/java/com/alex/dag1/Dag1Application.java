@@ -3,6 +3,7 @@ package com.alex.dag1;
 import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import com.alex.dag1.models.Forecast;
 import com.alex.dag1.services.ForecastService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +27,17 @@ public class Dag1Application implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		var scan = new Scanner(System.in);
 
+		var castFore = new Forecast();
+		castFore.setId(UUID.randomUUID());
+		castFore.setTemperature(21f);
+		castFore.setDate(20230824);
+		castFore.setHour(12);
+		var objectMapper = new ObjectMapper();
+		String json = objectMapper.writeValueAsString(castFore); //Skapar ett json object av "castFore" gör det till String.
+		System.out.println("This is the json object: " + json);
+
+		Forecast forecastTwo = objectMapper.readValue(json, Forecast.class); //Vet ej vad detta gör :/ typ samma sak?
+
 		while(true){
 			System.out.println("1. List all");
 			System.out.println("2. Create");
@@ -35,7 +47,7 @@ public class Dag1Application implements CommandLineRunner {
 
 			switch(sel){
 				case 1:
-					listPredicitions();
+					listPredicitions(); //Skickar oss till denna metod samma med nedre alternativ
 					break;
 				case 2:
 					addPrediction();
@@ -94,7 +106,7 @@ public class Dag1Application implements CommandLineRunner {
 		float temp = scan.nextFloat();
 
 		var forecast = new Forecast();
-		forecast.setId(UUID.randomUUID());
+		forecast.setId(UUID.randomUUID()); // Skapar ett random ID med hjälp av UUID
 		forecast.setDate(day);
 		forecast.setHour(hour);
 		forecast.setTemperature(temp);
