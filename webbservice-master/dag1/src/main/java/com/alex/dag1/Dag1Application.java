@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Scanner;
 import java.util.UUID;
@@ -72,7 +73,7 @@ public class Dag1Application implements CommandLineRunner {
 		}
 	}
 
-	private void updatePrediction(Scanner scan) {
+	private void updatePrediction(Scanner scan) throws IOException {
 		listPredicitions();
 		System.out.println("Ange vilken du vill uppdatera:");
 		int num = scan.nextInt();
