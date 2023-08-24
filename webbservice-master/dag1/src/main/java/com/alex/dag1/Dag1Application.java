@@ -5,6 +5,7 @@ import com.alex.dag1.models.BlogPost;
 import com.alex.dag1.models.Forecast;
 import com.alex.dag1.services.ForecastService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,7 +18,11 @@ import java.util.UUID;
 @SpringBootApplication
 public class Dag1Application implements CommandLineRunner {
 
-	ForecastService service = new ForecastService();
+	Scanner scan = new Scanner(System.in);
+
+
+	@Autowired
+	private ForecastService service;
 
 
 
@@ -28,16 +33,16 @@ public class Dag1Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+
 		var objectMapper = new ObjectMapper();
 
-		//BlogPost []blogPosts = objectMapper.readValue(new URL("https://jsonplaceholder.typicode.com/posts"),
-		//BlogPost[].class);
+		BlogPost blogPost = objectMapper.readValue(new URL("https://jsonplaceholder.typicode.com/posts/1"), BlogPost.class);
+				BlogPost []blogPost1 = objectMapper.readValue(new URL("https://jsonplaceholder.typicode.com/posts"), BlogPost[].class);
 
-		// BlogPost blogPost = objectMapper.readValue(new URL("https://jsonplaceholder.typicode.com/posts/1"),
-				// BlogPost.class); //Kommer hämta värderna från länken och lägga in de i våran klass / i våra variablar.
+				//Kommer hämta värderna från länken och lägga in de i våran klass / i våra variablar.
 
 
-		var scan = new Scanner(System.in);
+
 
 		var castFore = new Forecast();
 		castFore.setId(UUID.randomUUID());
