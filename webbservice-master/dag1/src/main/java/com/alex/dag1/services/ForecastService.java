@@ -3,6 +3,7 @@ package com.alex.dag1.services;
 import com.alex.dag1.models.Forecast;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -47,13 +48,8 @@ public class ForecastService {
 
     private static ObjectMapper getObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        //mapper.registerModule(new JavaTimeModule());
-    /*
-    <dependency>
-        <groupId>com.fasterxml.jackson.datatype</groupId>
-        <artifactId>jackson-datatype-jsr310</artifactId>
-    </dependency>
-    */
+        mapper.registerModule(new JavaTimeModule());
+
         return mapper;
     }
     
