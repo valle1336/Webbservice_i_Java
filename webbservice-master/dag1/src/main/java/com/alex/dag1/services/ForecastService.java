@@ -10,15 +10,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ForecastService {
     private static List<Forecast> forecasts = new ArrayList<>();
 
-    public ForecastService(){
+    public ForecastService() {
         try {
             forecasts = readFromFile();
         } catch (IOException e) {
@@ -27,10 +25,10 @@ public class ForecastService {
     }
 
     private List<Forecast> readFromFile() throws IOException {
-        if(!Files.exists(Path.of("predictions.json"))) return new ArrayList<Forecast>();
+        if (!Files.exists(Path.of("predictions.json"))) return new ArrayList<Forecast>();
         ObjectMapper objectMapper = getObjectMapper();
         var jsonStr = Files.readString(Path.of("predictions.json"));
-        return  new ArrayList(Arrays.asList(objectMapper.readValue(jsonStr, Forecast[].class ) ));
+        return new ArrayList(Arrays.asList(objectMapper.readValue(jsonStr, Forecast[].class)));
     }
 
     private void writeAllToFile(List<Forecast> weatherPredictions) throws IOException {
@@ -48,15 +46,20 @@ public class ForecastService {
 
     private static ObjectMapper getObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
+        //mapper.registerModule(new JavaTimeModule());
 
         return mapper;
     }
-    
+
     public static List<Forecast> getForecasts() {
         return forecasts;
     }
 
+    public void add(Forecast forecast) throws IOException {
+        forecast.setId(UUID.randomUUID());
+        forecasts.add(forecast);
+        writeAllToFile(forecasts);
+    }
     public static void setForecasts(List<Forecast> forecasts) {
         ForecastService.forecasts = forecasts;
     }
@@ -71,6 +74,11 @@ public class ForecastService {
 
     public void update(Forecast forecast) throws IOException{
         writeAllToFile(forecasts);
+    }
+
+    public static Optional<Forecast> get(UUID id) {
+        return getForecasts().stream().filter(c -> c.getId() == id)
+        .findFirst();
     }
 }
 
