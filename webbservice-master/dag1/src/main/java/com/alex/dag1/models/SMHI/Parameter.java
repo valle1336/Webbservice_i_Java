@@ -9,6 +9,8 @@ public class Parameter {
     public int level;
     public ArrayList<Double> values;
 
+    public String unit;
+
     public String getName() {
         return name;
     }

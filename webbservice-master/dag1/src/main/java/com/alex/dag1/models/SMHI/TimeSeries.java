@@ -1,6 +1,5 @@
 package com.alex.dag1.models.SMHI;
 
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Date;
 
