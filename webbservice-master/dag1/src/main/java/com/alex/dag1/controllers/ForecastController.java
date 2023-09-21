@@ -1,6 +1,6 @@
 package com.alex.dag1.controllers;
 
-import com.alex.dag1.models.Forecast;
+import com.alex.dag1.models.WeatherPrediction;
 import com.alex.dag1.services.ForecastService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,21 +24,21 @@ public class ForecastController {
     private ForecastService service;
 
     @GetMapping("/api/products")
-    public ResponseEntity<List<Forecast>> getAll() {
-        return new ResponseEntity<>(ForecastService.getForecasts(), HttpStatus.OK);
+    public ResponseEntity<List<WeatherPrediction>> getAll() {
+        return new ResponseEntity<>(service.getForecasts(), HttpStatus.OK);
     }
 
     @GetMapping("/api/forecasts/{id}")
-    public ResponseEntity<Forecast> Get(@PathVariable UUID id) {
-        Optional<Forecast> product = ForecastService.get(id);
+    public ResponseEntity<WeatherPrediction> Get(@PathVariable UUID id) {
+        Optional<WeatherPrediction> product = service.get(id);
         if (product.isPresent()) return ResponseEntity.ok(product.get());
         return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/api/forecasts/{id}")
-    public ResponseEntity<Forecast> Update(@PathVariable UUID id, @RequestBody Forecast forecast) throws IOException {
-        service.update(forecast);
-        return ResponseEntity.ok(forecast);
+    public ResponseEntity<WeatherPrediction> Update(@PathVariable UUID id, @RequestBody WeatherPrediction weatherPrediction) throws IOException {
+        service.update(weatherPrediction);
+        return ResponseEntity.ok(weatherPrediction);
     }
 
     /*@PostMapping("/api/forecasts")

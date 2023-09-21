@@ -1,10 +1,7 @@
 package com.alex.dag1;
 
-import com.alex.dag1.models.Forecast;
-import com.alex.dag1.models.SMHI.Geometry;
-import com.alex.dag1.models.SMHI.Parameter;
-import com.alex.dag1.models.SMHI.Root;
-import com.alex.dag1.models.SMHI.TimeSeries;
+import com.alex.dag1.models.WeatherPrediction;
+import com.alex.dag1.models.SMHI.*;
 import com.alex.dag1.services.ForecastService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -26,16 +25,12 @@ public class Dag1Application implements CommandLineRunner {
 	@Autowired
 	private ForecastService service;
 
+	CrudConsoleApplication crud = new CrudConsoleApplication(service);
+
 
 
 
 	public static void main(String[] args) {
-
-		var castFore = new Forecast();
-		castFore.setId(UUID.randomUUID());
-		castFore.setTemperature(21f);
-		castFore.setDate(20230824);
-		castFore.setHour(12);
 
 		SpringApplication.run(Dag1Application.class, args);
 	}
@@ -45,24 +40,18 @@ public class Dag1Application implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		var objectMapper = new ObjectMapper();
-
-		Root root = objectMapper.readValue(new URL("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/16.158/lat/58.5812/data.json"), Root.class);
-
-		String json = objectMapper.writeValueAsString(root);
-
-		System.out.println(json);
-
 
 		//Kommer hämta värderna från länken och lägga in de i våran klass / i våra variablar.
 
 
 
 		while (true) {
-			System.out.println("1. List all");
-			System.out.println("2. Create");
-			System.out.println("3. Update");
-			System.out.println("9. Exit");
+			System.out.println(
+					"1. List all \n" +
+					"2. Create \n" +
+					"3. Update \n" +
+					"4. Fetch from SMHI \n" +
+					"9. Exit");
 			int sel = scan.nextInt();
 
 			switch (sel) {
@@ -73,12 +62,37 @@ public class Dag1Application implements CommandLineRunner {
 					addPrediction();
 					break;
 				case 3:
-					updatePrediction(scan);
+					//updatePrediction(scan);
+					break;
+				case 4:
+					fetchFromSmhi();
+				case 5:
+					crud.run();
 					break;
 				case 9:
 					exitApplication();
 					break;
 			}
+		}
+	}
+
+	private void fetchFromSmhi() throws IOException {
+		var objectMapper = new ObjectMapper();
+
+		Root root = objectMapper.readValue(new URL("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/16.158/lat/58.5812/data.json"), Root.class);
+// Varje timeserie är ett klockslag , 10:00 11:00 12:00 13:00
+		for(var timeSerie : root.timeSeries){
+//Väder info
+			var forecast = new WeatherPrediction();
+			forecast.setId(UUID.randomUUID());
+			forecast.setPredictionHour(timeSerie.validTime.getHours());
+			forecast.setPredictionDatum( timeSerie.validTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() );
+			for(var parameter : timeSerie.getParameters()){
+				if(parameter.getName().equals("t")){
+					forecast.setPredictionTemperature((int) parameter.getValues().get(0).floatValue());
+				}
+			}
+			service.add(forecast);
 		}
 	}
 
@@ -88,6 +102,8 @@ public class Dag1Application implements CommandLineRunner {
 
 	}
 
+	/*
+
 	private void updatePrediction(Scanner scan) throws IOException {
 
 		listPredicitions();
@@ -96,24 +112,28 @@ public class Dag1Application implements CommandLineRunner {
 
 		var forecast = service.getByIndex(num - 1);
 		System.out.println(
-				forecast.getDate() +
-						forecast.getHour() +
-						forecast.getTemperature()
+				forecast.getPredictionDatum()
+						forecast.getPredictionHour()
+						forecast.getPredictionTemperature()
 		);
 
-		System.out.println("Update temp: ");
-		float temp = scan.nextFloat();
 
-		forecast.setTemperature(temp);
+
+		System.out.println("Update temp: ");
+		int temp = scan.nextInt();
+
+		forecast.setPredictionTemperature(temp);
 		service.update(forecast);
 
 		System.out.println("Temperature was updated! :)");
 
 	}
 
+	 */
+
 	private void addPrediction() {
 
-		Forecast fore = new Forecast();
+		WeatherPrediction fore = new WeatherPrediction();
 
 		//Input på dag, hour, temp
 		//Anropa servicen - Save
@@ -123,25 +143,23 @@ public class Dag1Application implements CommandLineRunner {
 
 		System.out.println("Add a day!");
 
-		int day = scan.nextInt();
-
 		System.out.println("Add an hour!!");
 
 		int hour = scan.nextInt();
 
 		System.out.println("Add a temperature!!");
 
-		float temp = scan.nextFloat();
+		int temp = scan.nextInt();
 
-		var forecast = new Forecast();
+		var forecast = new WeatherPrediction();
 		forecast.setId(UUID.randomUUID()); // Skapar ett random ID med hjälp av UUID
-		forecast.setDate(day);
-		forecast.setHour(hour);
-		forecast.setTemperature(temp);
+		forecast.setPredictionDatum(LocalDate.now());
+		forecast.setPredictionHour(hour);
+		forecast.setPredictionTemperature(temp);
 
 		System.out.println("Your prediction was added!");
 
-		service.addNew(forecast);
+		service.add(forecast);
 
 	}
 
@@ -150,9 +168,9 @@ public class Dag1Application implements CommandLineRunner {
 		for (var prediction : service.getForecasts()) {
 
 			System.out.printf("%d %d %f %n",
-					prediction.getDate(),
-					prediction.getHour(),
-					prediction.getTemperature());
+					prediction.getPredictionDatum(),
+					prediction.getPredictionHour(),
+					prediction.getPredictionTemperature());
 
 		}
 	}
